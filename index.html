@@ -1,0 +1,31 @@
+<!--
+ * @file: vue源码页面
+ * @copyright: NanJing Anshare Tech .Com
+ * @author: BoBo
+ * @Date: 2020年07月14 15:17:39
+--> 
+
+<html>
+  <head>
+    <title>vue源码简单实现</title>
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        {{person.name}} --- {{person.sex}}
+      </div>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script type="text/javascript">
+      let vm = new Vue({
+        el:'#app',
+        data:{
+          person:{
+            name:'张三',
+            sex:'男'
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
