@@ -14,11 +14,12 @@
       <div>
         {{person.name}} --- {{person.sex}}
       </div>
+      <h2>{{msg}}</h2>
     </div>
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
-    <!-- <script src="./src/MVue.js"></script> -->
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script> -->
+    <script src="./src/MVue.js"></script>
     <script type="text/javascript">
-      let vm = new Vue({
+      let vm = new MVue({
         el:'#app',
         data:{
           person:{
