@@ -3,32 +3,45 @@
  * @copyright: NanJing Anshare Tech .Com
  * @author: BoBo
  * @Date: 2020年07月14 15:17:39
---> 
+-->
 
 <html>
   <head>
-    <title>vue源码简单实现</title>
+    <title>vue source code </title>
   </head>
   <body>
+
     <div id="app">
       <div>
         {{person.name}} --- {{person.sex}}
       </div>
-      <h2>{{msg}}</h2>
+      <h2 v-text="msg"></h2>
+      <div v-html="msg"></div>
+      <input type="text" v-model="model"/>
+      <button v-on:click="handleClick">v-on事件button</button>
+      <button @click="handleClick">@事件button</button>
+      <img v-bind:src="imageSrc"/>
     </div>
     <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script> -->
     <script src="./src/MVue.js"></script>
     <script type="text/javascript">
       let vm = new MVue({
-        el:'#app',
-        data:{
-          person:{
-            name:'张三',
-            sex:'男'
+        el: "#app",
+        data: {
+          person: {
+            name: "张三",
+            sex: "男",
           },
-          msg:'Vue源码简单实现'
+          msg: "Vue源码简单实现",
+          model:'input框model',
+          imageSrc:'https://pic.downk.cc/item/5e78290a5c56091129507571.png'
+        },
+        methods:{
+          handleClick(index){
+            alert('按钮点击了' + index)
+          }
         }
-      })
+      });
     </script>
   </body>
 </html>
