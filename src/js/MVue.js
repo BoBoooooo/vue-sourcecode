@@ -5,6 +5,21 @@
  * @Date: 2020年07月14 15:24:01
  */
 
+export default class MVue {
+  constructor(options) {
+    this.$el = options.el;
+    this.$data = options.data;
+    this.$options = options;
+    if (this.$el) {
+      // 1.实现一个数据观察者
+
+      // 2. 实现一个指令解析器
+      new Compile(this.$el, this);
+    }
+  }
+}
+
+
 // 指令解析对象
 const compileUtil = {
   getVal(expr, vm) {
@@ -146,16 +161,6 @@ class Compile {
   }
 }
 
-class MVue {
-  constructor(options) {
-    this.$el = options.el;
-    this.$data = options.data;
-    this.$options = options;
-    if (this.$el) {
-      // 1.实现一个数据观察者
 
-      // 2. 实现一个指令解析器
-      new Compile(this.$el, this);
-    }
-  }
-}
+
+

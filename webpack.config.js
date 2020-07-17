@@ -9,7 +9,7 @@ const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry : path.resolve(__dirname,'src/js/MVue.js'),
+    entry : path.resolve(__dirname,'src/main.js'),
     output :{
         filename : 'src/js/[name]-[hash].js',
         path : path.resolve(__dirname,'dist')
