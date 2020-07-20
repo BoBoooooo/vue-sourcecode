@@ -7,7 +7,7 @@
 
 import MVue from './js/MVue.js';
 
-new MVue({
+window.vm = new MVue({
   el: "#app",
   data: {
     person: {
@@ -20,7 +20,7 @@ new MVue({
   },
   methods:{
     handleClick(index){
-      alert('按钮点击了' + index)
+      this.person.name = '沈飞飞';
     }
   }
 });

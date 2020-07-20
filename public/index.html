@@ -16,7 +16,8 @@
       </div>
       <h2 v-text="msg"></h2>
       <div v-html="msg"></div>
-      <input type="text" v-model="model"/>
+      <div>{{person.name}}</div>
+      <input type="text" v-model="person.name"/>
       <button v-on:click="handleClick">v-on事件button</button>
       <button @click="handleClick">@事件button</button>
       <img v-bind:src="imageSrc"/>

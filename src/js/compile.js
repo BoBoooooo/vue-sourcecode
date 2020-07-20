@@ -4,13 +4,33 @@
  * @author: BoBo
  * @Date: 2020年07月17 15:14:35
  */
+import { Watcher } from "./Observer.js";
 
 // 指令解析对象
-const compileUtil = {
+export const compileUtil = {
   getVal(expr, vm) {
     return expr.split(".").reduce((data, currentVal) => {
       return data[currentVal];
     }, vm.$data);
+  },
+  // 此处实现双向绑定,监听input输入内容 
+  setVal(expr, vm, inputVal) {
+    let model = vm.$data;
+    expr.split(".").forEach((k) => {
+      let value = model[k];
+      if (typeof value === "object") {
+        model = value;
+      } else {
+        model[k] = inputVal;
+      }
+    });
+  },
+  getContentVal(expr, vm) {
+    console.log(expr);
+    return expr.replace(/\{\{(.+?)\}\}/g, (...args) => {
+      console.log(args);
+      return this.getVal(args[1], vm);
+    });
   },
   // 解析v-text指令,以及模板{{ }} 语法
   text(node, expr, vm) {
@@ -18,6 +38,13 @@ const compileUtil = {
     // 解析所有 {{ }} 到对应值
     if (expr.includes("{{")) {
       value = expr.replace(/\{\{(.+?)\}\}/g, (...args) => {
+        // 初始化观察者
+        new Watcher(vm, args[1], () => {
+          this.updater.textUpdater(
+            node,
+            this.getContentVal(expr, vm)
+          );
+        });
         return this.getVal(args[1], vm);
       });
     } else {
@@ -28,10 +55,22 @@ const compileUtil = {
   },
   html(node, expr, vm) {
     const value = this.getVal(expr, vm);
+    // 初始化观察者
+    new Watcher(vm, expr, (newVal) => {
+      this.updater.htmlUpdater(node, newVal);
+    });
     this.updater.htmlUpdater(node, value);
   },
   model(node, expr, vm) {
     const value = this.getVal(expr, vm);
+    // 初始化观察者  -> 数据=>视图
+    new Watcher(vm, expr, (newVal) => {
+      this.updater.modelUpdater(node, newVal);
+    });
+    // 视图=>数据=>视图 双向绑定
+    node.addEventListener("input", (e) => {
+      this.setVal(expr, vm, e.target.value);
+    });
     this.updater.modelUpdater(node, value);
   },
   on(node, expr, vm, eventName) {
@@ -57,7 +96,7 @@ const compileUtil = {
 };
 
 // 指令解析器
-export default class Compile {
+export class Compile {
   constructor(el, vm) {
     this.el = this.isElementNode(el)
       ? el
@@ -69,7 +108,7 @@ export default class Compile {
 
     // 编译模板
 
-    this.compile(fragment);
+    this.compileTemplate(fragment);
     // 2.追加子元素到根元素
     this.el.appendChild(fragment);
   }
@@ -85,7 +124,7 @@ export default class Compile {
   }
 
   // 解析文档碎片对象
-  compile(fragment) {
+  compileTemplate(fragment) {
     // 1.获取子节点
     const childNodes = fragment.childNodes;
     [...childNodes].forEach((child) => {
@@ -97,7 +136,7 @@ export default class Compile {
         this.compileText(child);
       }
       if (Array.isArray([...child.childNodes])) {
-        this.compile(child);
+        this.compileTemplate(child);
       }
     });
   }
