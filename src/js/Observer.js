@@ -16,6 +16,9 @@ export class Watcher {
   }
   getOldVal() {
     Dep.target = this;
+    // 此处Observer已经将属性劫持,
+    // getVal会触发相应属性的get方法
+    // 从而将Watcher添加到Dep中
     const oldVal = compileUtil.getVal(this.expr, this.vm);
     Dep.target = null;
     return oldVal;
@@ -64,6 +67,7 @@ export class Observer {
       configurable: false,
       get() {
         // 订阅数据变化的时候,往Dep中添加观察者
+        // 在new Watcher时getVal会触发调用此处get方法
         Dep.target && dep.addSub(Dep.target);
         return value;
       },
