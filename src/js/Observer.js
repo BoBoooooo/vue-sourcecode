@@ -69,9 +69,11 @@ export class Observer {
       },
       // 此处注意this指向
       set: (newVal) => {
-        // 考虑可能直接赋值一个对象,需要重新建立观察
-        this.observe(newVal);
         if (newVal !== value) {
+          // 考虑可能直接赋值一个对象,需要重新建立观察
+          if (typeof newVal === "object") {
+            this.observe(newVal);
+          }
           value = newVal;
           // 告诉Dep通知变化
           dep.notify();
