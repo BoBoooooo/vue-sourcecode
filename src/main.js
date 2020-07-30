@@ -6,6 +6,7 @@
  */ 
 
 import MVue from './js/MVue.js';
+import './css/main.scss';
 
 window.vm = new MVue({
   el: "#app",
