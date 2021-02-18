@@ -28,3 +28,6 @@ window.vm = new MVue({
     }
   }
 });
+
+
+document.body.appendChild(document.createDocumentFragment())

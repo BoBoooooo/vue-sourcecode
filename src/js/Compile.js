@@ -8,12 +8,13 @@ import { Watcher } from "./Observer.js";
 
 // 指令解析对象
 export const compileUtil = {
+  // 递归表达式的值
   getVal(expr, vm) {
     return expr.split(".").reduce((data, currentVal) => {
       return data[currentVal];
     }, vm.$data);
   },
-  // 此处实现双向绑定,监听input输入内容 
+  // 此处实现双向绑定,监听input输入内容
   setVal(expr, vm, inputVal) {
     let model = vm.$data;
     expr.split(".").forEach((k) => {
@@ -25,11 +26,6 @@ export const compileUtil = {
       }
     });
   },
-  getContentVal(expr, vm) {
-    return expr.replace(/\{\{(.+?)\}\}/g, (...args) => {
-      return this.getVal(args[1], vm);
-    });
-  },
   // 解析v-text指令,以及模板{{ }} 语法
   text(node, expr, vm) {
     let value;
@@ -38,10 +34,7 @@ export const compileUtil = {
       value = expr.replace(/\{\{(.+?)\}\}/g, (...args) => {
         // 初始化观察者
         new Watcher(vm, args[1], () => {
-          this.updater.textUpdater(
-            node,
-            this.getContentVal(expr, vm)
-          );
+          this.updater.textUpdater(node, this.getVal(args[1], vm));
         });
         return this.getVal(args[1], vm);
       });
@@ -72,8 +65,7 @@ export const compileUtil = {
     this.updater.modelUpdater(node, value);
   },
   on(node, expr, vm, eventName) {
-    const fn =
-      vm.$options.methods && vm.$options.methods[expr].bind(vm);
+    const fn = vm.$options.methods && vm.$options.methods[expr].bind(vm);
     node.addEventListener(eventName, fn, false);
   },
   bind(node, expr, vm, eventName) {
@@ -96,9 +88,7 @@ export const compileUtil = {
 // 指令解析器
 export class Compile {
   constructor(el, vm) {
-    this.el = this.isElementNode(el)
-      ? el
-      : document.querySelector(el);
+    this.el = this.isElementNode(el) ? el : document.querySelector(el);
     this.vm = vm;
     // 1.获取文档碎片对象 放入内存中减少页面回流和重绘
 
