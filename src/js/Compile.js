@@ -115,7 +115,9 @@ export class Compile {
   node2Fragment(el) {
     const f = document.createDocumentFragment();
     let firstChild;
+    // https://segmentfault.com/q/1010000020190333
     while ((firstChild = el.firstChild)) {
+      // 此处appendChild会把已有dom节点移动至文档碎片对象中
       f.appendChild(firstChild);
     }
     return f;

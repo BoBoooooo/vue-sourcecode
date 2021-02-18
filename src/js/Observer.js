@@ -45,6 +45,9 @@ class Dep {
   }
 }
 
+
+// 建立观察者
+// 遍历整个data 给每个属性分别添加相应的get set劫持
 export class Observer {
   constructor(data) {
     this.observe(data);
