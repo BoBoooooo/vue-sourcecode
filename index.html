@@ -11,16 +11,8 @@
   </head>
   <body>
     <div id="app">
-      <div>
-        {{person.name}} --- {{person.sex}}
-      </div>
-      <h2 v-text="msg"></h2>
-      <div v-html="msg"></div>
       <div>{{person.name}}</div>
       <input type="text" v-model="person.name"/>
-      <button v-on:click="handleClick">v-on事件button</button>
-      <button @click="handleClick2">@事件button</button>
-      <img v-bind:src="imageSrc"/>
     </div>
   </body>
 </html>

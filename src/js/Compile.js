@@ -8,7 +8,6 @@ import { Watcher } from "./Observer.js";
 
 // 指令解析对象
 export const compileUtil = {
-  // 递归表达式的值
   getVal(expr, vm) {
     return expr.split(".").reduce((data, currentVal) => {
       return data[currentVal];
@@ -26,7 +25,7 @@ export const compileUtil = {
       }
     });
   },
-  // 解析v-text指令,以及模板{{ }} 语法
+  // 解析模板{{ }} 语法
   text(node, expr, vm) {
     let value;
     // 解析所有 {{ }} 到对应值
@@ -38,19 +37,8 @@ export const compileUtil = {
         });
         return this.getVal(args[1], vm);
       });
-    } else {
-      // 解析v-text到对应值
-      value = this.getVal(expr, vm);
     }
     this.updater.textUpdater(node, value);
-  },
-  html(node, expr, vm) {
-    const value = this.getVal(expr, vm);
-    // 初始化观察者
-    new Watcher(vm, expr, (newVal) => {
-      this.updater.htmlUpdater(node, newVal);
-    });
-    this.updater.htmlUpdater(node, value);
   },
   model(node, expr, vm) {
     const value = this.getVal(expr, vm);
@@ -64,20 +52,9 @@ export const compileUtil = {
     });
     this.updater.modelUpdater(node, value);
   },
-  on(node, expr, vm, eventName) {
-    const fn = vm.$options.methods && vm.$options.methods[expr].bind(vm);
-    node.addEventListener(eventName, fn, false);
-  },
-  bind(node, expr, vm, eventName) {
-    const value = this.getVal(expr, vm);
-    node.setAttribute(eventName, value);
-  },
   updater: {
     textUpdater(node, value) {
       node.textContent = value;
-    },
-    htmlUpdater(node, value) {
-      node.innerHTML = value;
     },
     modelUpdater(node, value) {
       node.value = value;
@@ -88,7 +65,7 @@ export const compileUtil = {
 // 指令解析器
 export class Compile {
   constructor(el, vm) {
-    this.el = this.isElementNode(el) ? el : document.querySelector(el);
+    this.el =  document.querySelector(el);
     this.vm = vm;
     // 1.获取文档碎片对象 放入内存中减少页面回流和重绘
 
@@ -105,9 +82,7 @@ export class Compile {
   node2Fragment(el) {
     const f = document.createDocumentFragment();
     let firstChild;
-    // https://segmentfault.com/q/1010000020190333
     while ((firstChild = el.firstChild)) {
-      // 此处appendChild会把已有dom节点移动至文档碎片对象中
       f.appendChild(firstChild);
     }
     return f;
@@ -138,18 +113,12 @@ export class Compile {
       const { name, value } = attr;
       // 判断当前元素结点属性是否含有vue指令 "v-"
       if (this.isDirective(name)) {
-        // v-text , v-html , v-on ,v-model等
-        const [, dirctive] = name.split("-"); // text , html , on , model
-        const [dirName, eventName] = dirctive.split(":"); // 指令名,事件名
+        // 解析v-model等
+        const [, dirctive] = name.split("-"); // 解析v-model
         // 指令解析器,更新数据 数据驱动视图
-        compileUtil[dirName](node, value, this.vm, eventName);
+        compileUtil.model(node, value, this.vm);
         // 删除有指令标签上的属性
         node.removeAttribute("v-" + dirctive);
-      }
-      // 判断是否使用了缩写 例如@click="xxx"
-      else if (this.isEventName(name)) {
-        const [, eventName] = name.split("@");
-        compileUtil["on"](node, value, this.vm, eventName);
       }
     });
   }
@@ -168,10 +137,6 @@ export class Compile {
   // 判断属性是否为vue指令
   isDirective(attrName) {
     return attrName.startsWith("v-");
-  }
-  // 判断是否为@缩写
-  isEventName(attrName) {
-    return attrName.startsWith("@");
   }
 
   // 判断是否为dom结点
