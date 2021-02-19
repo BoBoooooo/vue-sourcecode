@@ -17,20 +17,6 @@ export default class MVue {
       new Observer(this.$data);
       // 2. 实现一个指令解析器
       new Compile(this.$el, this);
-      this.proxyData(this.$data)
-    }
-  }
-  // 代理data  直接vm.xxx访问
-  proxyData(data){
-    for(const key in data){
-      Object.defineProperty(this,key,{
-        get(){
-          return data[key]
-        },
-        set(val){
-         data[key] = val;
-        }
-      })
     }
   }
 }
