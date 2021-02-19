@@ -15,7 +15,7 @@ export class Watcher {
     this.oldVal = this.getOldVal();
   }
   getOldVal() {
-    Dep.target = this;
+    Dep.target = this;                                                                                                                                                                                                                                            
     // 此处Observer已经将属性劫持,
     // getVal会触发相应属性的get方法
     // 从而将Watcher添加到Dep中

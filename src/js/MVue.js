@@ -13,9 +13,9 @@ export default class MVue {
     this.$data = options.data;
     this.$options = options;
     if (this.$el) {
-      // 1.实现一个数据观察者
+      // 建立数据观察者
       new Observer(this.$data);
-      // 2. 实现一个指令解析器
+      // 解析指令模板
       new Compile(this.$el, this);
     }
   }
