@@ -4,27 +4,25 @@
  * @author: BoBo
  * @Date: 2020年07月20 21:37:03
  */
-import { compileUtil } from "./Compile.js";
-
 export class Watcher {
-  constructor(vm, expr, callback) {
+  constructor(vm, key, callback) {
     this.vm = vm;
-    this.expr = expr;
+    this.key = key;
     this.callback = callback;
     // 先把旧值保存起来
     this.oldVal = this.getOldVal();
   }
   getOldVal() {
-    Dep.target = this;                                                                                                                                                                                                                                            
+    Dep.target = this;
     // 此处Observer已经将属性劫持,
     // getVal会触发相应属性的get方法
     // 从而将Watcher添加到Dep中
-    const oldVal = compileUtil.getVal(this.expr, this.vm);
+    const oldVal = this.vm.$data[this.key];
     Dep.target = null;
     return oldVal;
   }
   update() {
-    const newVal = compileUtil.getVal(this.expr, this.vm);
+    const newVal = this.vm.$data[this.key];
     if (newVal !== this.oldVal) {
       this.callback(newVal);
     }
@@ -44,7 +42,6 @@ class Dep {
     this.subs.forEach((w) => w.update());
   }
 }
-
 
 // 建立观察者
 // 遍历整个data 给每个属性分别添加相应的get set劫持

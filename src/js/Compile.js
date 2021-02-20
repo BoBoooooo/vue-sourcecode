@@ -8,23 +8,6 @@ import { Watcher } from "./Observer.js";
 
 // 指令解析对象
 export const compileUtil = {
-  getVal(expr, vm) {
-    return expr.split(".").reduce((data, currentVal) => {
-      return data[currentVal];
-    }, vm.$data);
-  },
-  // 此处实现双向绑定,监听input输入内容
-  setVal(expr, vm, inputVal) {
-    let model = vm.$data;
-    expr.split(".").forEach((k) => {
-      let value = model[k];
-      if (typeof value === "object") {
-        model = value;
-      } else {
-        model[k] = inputVal;
-      }
-    });
-  },
   // 解析模板{{ }} 语法
   text(node, expr, vm) {
     let value;
@@ -33,22 +16,22 @@ export const compileUtil = {
       value = expr.replace(/\{\{(.+?)\}\}/g, (...args) => {
         // 初始化观察者
         new Watcher(vm, args[1], () => {
-          this.updater.textUpdater(node, this.getVal(args[1], vm));
+          this.updater.textUpdater(node, vm.$data[args[1]]);
         });
-        return this.getVal(args[1], vm);
+        return vm.$data[args[1]];
       });
     }
     this.updater.textUpdater(node, value);
   },
-  model(node, expr, vm) {
-    const value = this.getVal(expr, vm);
+  model(node, key, vm) {
+    const value = vm.$data[key];
     // 初始化观察者  -> 数据=>视图
-    new Watcher(vm, expr, (newVal) => {
+    new Watcher(vm, key, (newVal) => {
       this.updater.modelUpdater(node, newVal);
     });
     // 视图=>数据=>视图 双向绑定
     node.addEventListener("input", (e) => {
-      this.setVal(expr, vm, e.target.value);
+      vm.$data[key] = e.target.value;
     });
     this.updater.modelUpdater(node, value);
   },
@@ -65,7 +48,7 @@ export const compileUtil = {
 // 指令解析器
 export class Compile {
   constructor(el, vm) {
-    this.el =  document.querySelector(el);
+    this.el = document.querySelector(el);
     this.vm = vm;
     // 1.获取文档碎片对象 放入内存中减少页面回流和重绘
 
@@ -112,13 +95,11 @@ export class Compile {
     [...attributes].forEach((attr) => {
       const { name, value } = attr;
       // 判断当前元素结点属性是否含有vue指令 "v-"
-      if (this.isDirective(name)) {
-        // 解析v-model等
-        const [, dirctive] = name.split("-"); // 解析v-model
+      if (name === "v-model") {
         // 指令解析器,更新数据 数据驱动视图
         compileUtil.model(node, value, this.vm);
         // 删除有指令标签上的属性
-        node.removeAttribute("v-" + dirctive);
+        node.removeAttribute("v-model");
       }
     });
   }
@@ -132,11 +113,6 @@ export class Compile {
       return compileUtil.text(node, content, this.vm);
     }
     return content;
-  }
-
-  // 判断属性是否为vue指令
-  isDirective(attrName) {
-    return attrName.startsWith("v-");
   }
 
   // 判断是否为dom结点
